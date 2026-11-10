@@ -994,5 +994,71 @@ Telegram-бота</td>
 адміністративних правил. Для практичного використання таких відомостей
 потрібно звірити аудіо та чинні офіційні вимоги.</p>
 <footer class="site-footer"><div class="container"><a href="../index.html">← До матеріалів семінару</a></div></footer>
+<script>
+  const timecodePattern = /\b(?:\d{1,2}:)?\d{2}:\d{2}\b/g;
+  const tocLinks = document.querySelectorAll('#TOC a[href^="#"]');
+
+  for (const tocLink of tocLinks) {
+    const label = tocLink.textContent;
+    timecodePattern.lastIndex = 0;
+    const timestamps = [...label.matchAll(timecodePattern)];
+    if (timestamps.length === 0) continue;
+
+    tocLink.textContent = label.slice(0, timestamps[0].index).trimEnd();
+    const range = document.createElement('span');
+    range.append(document.createTextNode(' ('));
+
+    timestamps.forEach((match, index) => {
+      if (index > 0) range.append(document.createTextNode('–'));
+      const parts = match[0].split(':').map(Number);
+      const seconds = parts.length === 3
+        ? parts[0] * 3600 + parts[1] * 60 + parts[2]
+        : parts[0] * 60 + parts[1];
+      const link = document.createElement('a');
+      link.href = `../audio/index.html#t=${seconds}`;
+      link.textContent = match[0];
+      link.setAttribute('aria-label', `Прослухати з ${match[0]}`);
+      range.append(link);
+    });
+
+    range.append(document.createTextNode(')'));
+    tocLink.after(range);
+  }
+
+  const textNodes = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodesToLink = [];
+
+  while (textNodes.nextNode()) {
+    const node = textNodes.currentNode;
+    if (node.parentElement.closest('a')) {
+      timecodePattern.lastIndex = 0;
+      continue;
+    }
+    if (timecodePattern.test(node.textContent)) nodesToLink.push(node);
+    timecodePattern.lastIndex = 0;
+  }
+
+  for (const node of nodesToLink) {
+    const fragment = document.createDocumentFragment();
+    let lastIndex = 0;
+
+    for (const match of node.textContent.matchAll(timecodePattern)) {
+      fragment.append(document.createTextNode(node.textContent.slice(lastIndex, match.index)));
+      const parts = match[0].split(':').map(Number);
+      const seconds = parts.length === 3
+        ? parts[0] * 3600 + parts[1] * 60 + parts[2]
+        : parts[0] * 60 + parts[1];
+      const link = document.createElement('a');
+      link.href = `../audio/index.html#t=${seconds}`;
+      link.textContent = match[0];
+      link.setAttribute('aria-label', `Прослухати з ${match[0]}`);
+      fragment.append(link);
+      lastIndex = match.index + match[0].length;
+    }
+
+    fragment.append(document.createTextNode(node.textContent.slice(lastIndex)));
+    node.replaceWith(fragment);
+  }
+</script>
 </body>
 </html>

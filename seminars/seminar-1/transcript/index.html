@@ -240,17 +240,26 @@
     return `${mm}:${ss}`;
   }
 
+  function timecodeSeconds(value) {
+    const [timePart] = value.replace(',', '.').split('.');
+    const [hours, minutes, seconds] = timePart.split(':').map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+  }
+
   function renderTranscript(entries) {
     const container = document.getElementById('transcript-entries');
 
     if (!container) return;
 
-    container.innerHTML = entries.map((entry) => `
+    container.innerHTML = entries.map((entry) => {
+      const startSeconds = timecodeSeconds(entry.start);
+      return `
       <article class="transcript-item">
-        <div class="timecode">${formatTimecode(entry.start)}–${formatTimecode(entry.end)}</div>
+        <div class="timecode"><a href="../audio/index.html#t=${startSeconds}" aria-label="Прослухати з ${formatTimecode(entry.start)}">${formatTimecode(entry.start)}–${formatTimecode(entry.end)}</a></div>
         <p class="transcript-text">${entry.text}</p>
       </article>
-    `).join('');
+    `;
+    }).join('');
   }
 
   async function loadTranscript() {

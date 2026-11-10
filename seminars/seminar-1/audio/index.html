@@ -1,3 +1,25 @@
 <!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Аудіозапис семінару</title><link rel="stylesheet" href="../../../css/style.css"></head><body>
 <header class="site-header"><div class="container"><a class="site-title" href="../../../index.html">Пошук житла в Берліні</a><p class="site-subtitle">Матеріали семінару · 11.12.2024</p></div></header>
-<main class="container document"><nav class="breadcrumbs"><a href="../../../index.html">Головна</a><span>/</span><a href="../index.html">Семінар</a><span>/</span><span>Аудіозапис семінару</span></nav><h1>Аудіозапис семінару</h1><p class="lead">Прослухайте запис безпосередньо на сторінці.</p><div class="notice"><p>Додайте аудіофайл до цієї папки та вкажіть його назву в елементі audio.</p></div><audio controls preload="metadata"><source src="audio-file.m4a" type="audio/mp4">Ваш браузер не підтримує аудіо.</audio><p><a href="../index.html">← До матеріалів семінару</a></p></main><footer class="site-footer"><div class="container">Пошук житла в Берліні</div></footer></body></html>
+<main class="container document"><nav class="breadcrumbs"><a href="../../../index.html">Головна</a><span>/</span><a href="../index.html">Семінар</a><span>/</span><span>Аудіозапис семінару</span></nav><h1>Аудіозапис семінару</h1><p class="lead">Прослухайте запис безпосередньо на сторінці або перейдіть до аудіо з часових позначок у конспекті й транскрипції.</p><audio id="seminar-audio" controls preload="metadata"><source src="HauseSucheSeminar20241211.m4a" type="audio/mp4">Ваш браузер не підтримує аудіо.</audio><p><a href="../index.html">← До матеріалів семінару</a></p></main><footer class="site-footer"><div class="container">Пошук житла в Берліні</div></footer>
+<script>
+  const audio = document.getElementById('seminar-audio');
+
+  function seekToHashTime() {
+    const match = window.location.hash.match(/^#t=(\d+(?:\.\d+)?)$/);
+    if (!match) return;
+
+    const seconds = Number(match[1]);
+    if (!Number.isFinite(seconds)) return;
+    audio.currentTime = Number.isFinite(audio.duration)
+      ? Math.min(seconds, audio.duration)
+      : seconds;
+  }
+
+  if (audio.readyState >= 1) {
+    seekToHashTime();
+  } else {
+    audio.addEventListener('loadedmetadata', seekToHashTime, { once: true });
+  }
+  window.addEventListener('hashchange', seekToHashTime);
+</script>
+</body></html>
